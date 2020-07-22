@@ -28,13 +28,21 @@ class Game:
         background_image = pygame.image.load(image_path)
         self.image = pygame.transform.scale(background_image, (width, height))
 
-    def run_game_loop(self):
+    def run_game_loop(self, level):
         is_game_over = False
         did_win = True
         direction = 0
 
         player_character = PlayerCharacter('player.png',375,700,50,50)
-        enemy0 = NonPlayerCharacter('enemy.png',75,300,50,50)
+        enemy0 = NonPlayerCharacter('enemy.png',75,600,50,50)
+        enemy0.SPEED *= level
+
+        enemy1 = NonPlayerCharacter('enemy.png',self.width - 755 ,400,50,50)
+        enemy1.SPEED *= level
+
+        enemy2 = NonPlayerCharacter('enemy.png',75,200,50,50)
+        enemy2.SPEED *= level
+
         treasure = GameObject('treasure.png', 375, 50, 50, 50)
 
         while not is_game_over:
@@ -74,6 +82,30 @@ class Game:
             enemy0.move(self.width)
             enemy0.draw(self.game_screen)
 
+            if level > 2:
+                enemy1.move(self.width)
+                enemy1.draw(self.game_screen)
+                if player_character.detect_collision(enemy1):
+                    is_game_over=True
+                    did_win = False
+                    text = font.render('You lose!',True, BLACK_COLOR)
+                    self.game_screen.blit(text, (300,350))
+                    pygame.display.update()
+                    clock.tick(1)
+                    break
+           
+            if level > 4:
+                enemy2.move(self.width)
+                enemy2.draw(self.game_screen)
+                if player_character.detect_collision(enemy2):
+                    is_game_over=True
+                    did_win = False
+                    text = font.render('You lose!',True, BLACK_COLOR)
+                    self.game_screen.blit(text, (300,350))
+                    pygame.display.update()
+                    clock.tick(1)
+                    break
+
             # start collision detection
             if player_character.detect_collision(enemy0):
                 is_game_over=True
@@ -99,7 +131,7 @@ class Game:
             clock.tick(self.TICK_RATE)
 
         if did_win:
-            self.run_game_loop()
+            self.run_game_loop(level + 0.5)
         else:
             return
 
@@ -179,10 +211,8 @@ class NonPlayerCharacter(GameObject):
 pygame.init()
 
 new_game=Game('background.png', SCREEN_TITLE, SCREEN_WIDTH, SCREEN_HEIGHT)
-new_game.run_game_loop()
+new_game.run_game_loop(1)
 
 # Quit Pygame and the programm
 pygame.quit()
 quit()
-
-
